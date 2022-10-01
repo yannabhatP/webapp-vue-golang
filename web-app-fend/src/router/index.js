@@ -1,29 +1,34 @@
 import { createWebHistory, createRouter } from "vue-router";
-
-import Home from "@/components/Home.vue";
-import AllProduct from "@/components/AllProduct.vue";
-import Product from "@/components/Product.vue";
-import SlimProduct from "@/components/SlimProduct.vue";
-
+import Home from "@/views/HomeView.vue";
+import Product from "@/views/ProductView.vue";
+import Default from "@/views/DefaultProductView.vue";
+import Slim from "@/views/SlimProductView.vue";
 
 
 const routes = [
   {
-    path: "/",
-    component: Home,
+    path: '/',
+    name: 'home',
+    component: Home
   },
   {
-    path: "/all-product",
-    component: AllProduct,
+    path: '/product',
+    name: 'product',
+    component: Product
   },
   {
-    path: "/product",
-    component: Product,
+    path: '/default',
+    name: 'default',
+    component: Default
   },
   {
-    path: "/slim-product",
-    component: SlimProduct,
+    path: '/slim',
+    name: 'slim',
+    component: Slim
   },
+  
+  
+  
 ];
 
 const router = createRouter({
