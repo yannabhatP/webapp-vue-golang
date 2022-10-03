@@ -31,7 +31,7 @@
         <div class="row row-cols-3">
             <CardVue
                 v-for="( item,i) in keyboard"
-                :data="item"
+                :keyboard="item"
                 :key="i"
             />
         </div>

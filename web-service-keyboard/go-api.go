@@ -254,6 +254,7 @@ func main() {
 	db.SetMaxIdleConns(10)
 
 	router := gin.Default()
+	router.SetTrustedProxies([]string{"192.168.1.2"})
 	router.Use(cors.Default())
 	//router.GET("/", GetAttractions)
 	router.GET("/all", GetAllProduct)

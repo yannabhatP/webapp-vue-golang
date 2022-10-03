@@ -7,7 +7,7 @@ export default {
 </script>
 
 <template>
-    <div class="col card m-4 " style="width: 18rem;">
+    <div class="col card m-4 p-4" style="width: 18rem;">
         <img :src="aboutKeyboard.image" class="card-img-top" alt="">
         <div class="card-body">
             <h5 class="card-title text-center">{{aboutKeyboard.head}}</h5>

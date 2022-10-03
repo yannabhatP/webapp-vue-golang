@@ -8,12 +8,22 @@
       IconAccount,
       IconSearch,
       IconCart
+    },
+    data(){
+        return {
+          showMenu: false
+        }
+    },
+    methods: {
+        showOffcanvasMenu(){
+            this.showMenu ? this.showMenu = false : this.showMenu = true;
+        }
     }
   }
 </script>    
 
 <template>
-  <div>
+  <div tabindex="-2">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid ms-3 me-2">
         <router-link to="/" class="navbar-brand" href="#">
@@ -38,14 +48,23 @@
               </router-link>
             </li>
             <li class="nav-item p-2">
-              <router-link to="/slim" class="nav-link">
+              <div  class="nav-link" @click.prevent="showOffcanvasMenu()">
                 <IconCart/>
-              </router-link>
+              </div>
             </li>
           </ul>
         </div>
       </div>
-    </nav>
+    </nav> 
+    <div class="offcanvas offcanvas-end" :class="showMenu ? 'show' : ''" tabindex="-1" :style="{ visibility: showMenu ? 'visible' : 'hidden' }">
+      <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="">Offcanvas with backdrop</h5>
+          <button type="button" class="btn-close text-reset" @click.prevent="showOffcanvasMenu()"></button>
+      </div>
+      <div class="offcanvas-body">
+          <p>.....</p>
+      </div>
+    </div>
     <router-view></router-view>
     <div class="fixed-bottom bg-light">
       <div class="container-fluid">
@@ -53,53 +72,4 @@
       </div>
     </div>
   </div>
-  
-  <!-- <div class="card flex-column "> 
-    <div class="card-header p-0 justify-content-start"> 
-      <nav class="navbar navbar-light bg-light flex-nowrap flex-row">
-        <div class="d-flex ms-5 align-items-center float-left" >
-            <router-link to="/product" class="navbar-brand fs-4 fw-bold font-oblique">Keychron Store by Tim</router-link>
-            <ul class="nav navbar-nav flex-row">
-              <li class="nav-item p-2">
-                <router-link to="/default" class="nav-link">Products</router-link>
-              </li>
-              <li class="nav-item p-2">
-                <router-link to="/slim" class="nav-link">Slim Product</router-link>
-              </li>
-            </ul>
-          </div>
-          <div class="me-4 align-items-center float-right">
-            <ul class="nav navbar-nav flex-row">
-              <li class="nav-item p-2">
-                <router-link to="/product" class="nav-link">
-                  <IconAccount/>
-                </router-link>
-              </li>
-              <li class="nav-item p-2">
-                <router-link to="/default" class="nav-link">
-                  <IconSearch/>
-                </router-link>
-              </li>
-              <li class="nav-item p-2">
-                <router-link to="/slim" class="nav-link">
-                  <IconCart/>
-                </router-link>
-              </li>
-            </ul>
-          </div>
-      </nav>
-    </div>
-    <div class="card-body container mt-2">
-      <router-view></router-view>
-    </div>
-    <nav class="navbar fixed-bottom navbar-light bg-light">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">Fixed bottom</a>
-      </div>
-    </nav>
-   <div class="justify-content-end card-footer bg-light text-muted">
-      2 day ago
-    </div>
-  </div> -->
- 
 </template>

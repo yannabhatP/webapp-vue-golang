@@ -3,7 +3,8 @@ import Home from "@/views/HomeView.vue";
 import Product from "@/views/ProductView.vue";
 import Default from "@/views/DefaultProductView.vue";
 import Slim from "@/views/SlimProductView.vue";
-
+import Keyboard from "@/views/KeyboardView.vue";
+import CheckOut from "@/views/CheckOutView.vue";
 
 const routes = [
   {
@@ -26,6 +27,22 @@ const routes = [
     name: 'slim',
     component: Slim
   },
+  {
+    path: '/keyboard/:id',
+    name: 'keyboard',
+    component: Keyboard
+  },
+  {
+    path: '/checkout',
+    name: 'checkout',
+    component: CheckOut
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'notfound',
+    component: ()=> import('@/views/NotFoundView.vue')
+  },
+  
   
   
   

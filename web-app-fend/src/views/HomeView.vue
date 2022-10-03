@@ -13,7 +13,8 @@ export default {
     return {
       carousalData:[],
       keyType:[],
-      aboutKey:[]
+      aboutKey:[],
+      hrefPage:[]
     }
   },
   created(){
@@ -27,6 +28,7 @@ export default {
       this.carousalData = data.carousal
       this.keyType = data.type
       this.aboutKey = data.about
+      this.hrefPage =data.route
     }
   }
   
@@ -58,9 +60,10 @@ export default {
     </div>
     <div class="row ">
       <CardTypeVue
-        v-for="item1 in keyType"
+        v-for=" (item1,i) in keyType"
         :typeKeyboard="item1"
         :key="item1.id"
+        :page="hrefPage[i]"
       /> 
     </div>
     <div class="row ">
