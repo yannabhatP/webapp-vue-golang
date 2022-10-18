@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -16,6 +17,14 @@ type Product struct {
 	Description string  `db:"description" json:"description"`
 	Price       float32 `db:"price" json:"price"`
 	Image       string  `db:"image" json:"image"`
+}
+
+type Person struct {
+	Email   string `db:"email" json:"email"`
+	Pass    string `db:"password" json:"password"`
+	Fname   string `db:"fname" json:"fname"`
+	Lname   string `db:"lname" json:"lname"`
+	Address string `db:"address" json:"address"`
 }
 
 var db *sqlx.DB
@@ -48,6 +57,58 @@ func getNormalProduct() ([]Product, error) {
 		return nil, err
 	}
 	return product, nil
+}
+
+func getProdeuctByID(id string) (*Product, error) {
+	query := `select id, name, price, image from product where id = ?`
+	product := Product{}
+	err := db.Get(&product, query, id)
+	if err != nil {
+		return nil, err
+	}
+	return &product, nil
+}
+func getPerson(email string) (*Person, error) {
+	query := `select email, password, fname, lname, address from person where email = ?`
+	person := Person{}
+	err := db.Get(&person, query, email)
+	if err != nil {
+		return nil, err
+	}
+	return &person, nil
+}
+func getAllPerson() ([]Person, error) {
+	query := "select email, password, fname, lname, address from person "
+	person := []Person{}
+	err := db.Select(&person, query)
+	if err != nil {
+		return nil, err
+	}
+	return person, nil
+}
+func addPerson(per Person) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	query := "insert into person (email, password, fname, lname, address) value (?, ?, ?, ?, ?)"
+	result, err := tx.Exec(query, per.Email, per.Pass, per.Fname, per.Lname, per.Address)
+	if err != nil {
+		return err
+	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	if affected <= 0 {
+		return errors.New("cannot insert into attraction")
+	}
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 /*
@@ -170,6 +231,46 @@ func GetNormalProduct(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, normalproduct)
 }
 
+func GetProductByID(c *gin.Context) {
+	strId := c.Param("id")
+	prod, err := getProdeuctByID(strId)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, err)
+		return
+	}
+	c.IndentedJSON(http.StatusOK, prod)
+}
+func GetAllPerson(c *gin.Context) {
+	allperson, err := getAllPerson()
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, err)
+		return
+	}
+	c.IndentedJSON(http.StatusOK, allperson)
+}
+func GetPerson(c *gin.Context) {
+	strEmail := c.Param("email")
+	prod, err := getPerson(strEmail)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, err)
+		return
+	}
+	c.IndentedJSON(http.StatusOK, prod)
+}
+func PostPerson(c *gin.Context) {
+	var p Person
+	if err := c.BindJSON(&p); err != nil {
+		return
+	}
+	err := addPerson(p)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, err)
+		return
+	}
+	//albums = append(albums, newAlbum)
+	c.IndentedJSON(http.StatusCreated, p)
+}
+
 /*
 	func GetAttractions(c *gin.Context) {
 		attractions, err := getAttractions()
@@ -260,7 +361,10 @@ func main() {
 	router.GET("/all", GetAllProduct)
 	router.GET("/slim", GetSlimProduct)
 	router.GET("/normal", GetNormalProduct)
-
+	router.GET("/keyboard/:id", GetProductByID)
+	router.GET("/person/:email", GetPerson)
+	router.GET("/person", GetAllPerson)
+	router.POST("/person", PostPerson)
 	//router.GET("/:id", GetAttraction)
 	//router.POST("/", PostAttraction)
 	//router.PUT("/:id", PutAttraction)

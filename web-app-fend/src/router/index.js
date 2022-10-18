@@ -20,15 +20,17 @@ const routes = [
   {
     path: '/default',
     name: 'default',
-    component: Default
+    component: Default,
+    props: route => ({ query: route.query.id })
   },
   {
     path: '/slim',
     name: 'slim',
-    component: Slim
+    component: Slim,
+    props: route => ({ query: route.query.id })
   },
   {
-    path: '/keyboard/:id',
+    path: '/keyboard',
     name: 'keyboard',
     component: Keyboard
   },
@@ -37,6 +39,7 @@ const routes = [
     name: 'checkout',
     component: CheckOut
   },
+  
   {
     path: '/:pathMatch(.*)*',
     name: 'notfound',

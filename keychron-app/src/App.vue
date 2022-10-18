@@ -1,9 +1,9 @@
 <script >
 
-  import IconCart from '@/components/icons/IconCart.vue';
-  import IconSearch from '@/components/icons/IconSearch.vue';
-  import IconAccount from '@/components/icons/IconAccount.vue';
-  import Cart from '@/components/Cart.vue'
+  import IconCart from './components/icons/IconCart.vue';
+  import IconSearch from './components/icons/IconSearch.vue';
+  import IconAccount from './components/icons/IconAccount.vue';
+  import Cart from './components/Cart.vue'
   export default{
     components:{
       IconAccount,
@@ -45,7 +45,7 @@
           </ul>
           <ul class="d-flex navbar-nav ">
             <li class="nav-item p-2">
-              <router-link to="/product" class="nav-link">
+              <router-link to="/account" class="nav-link">
                 <IconAccount/>
               </router-link>
             </li>
