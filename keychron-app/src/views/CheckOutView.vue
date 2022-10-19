@@ -1,10 +1,12 @@
 <script>
     
 import {cart} from "../store/cart.js"
+import {profile} from "../store/profile.js"
     export default {
         data(){
             return{
                 cart,
+                profile,
                 total:0
             }
         },
@@ -20,6 +22,21 @@ import {cart} from "../store/cart.js"
                 },
                 deep: true,
                 immediate: true 
+            }
+        },
+        methods:{
+            onCheckOut:function(){
+                if(profile.account == null){
+                    this.$router.push('/login')
+                }else{
+                    let data={}
+                    data.email = profile.account.email 
+                    data.o_detail = JSON.stringify(cart.product)
+                    this.axios.post('http://localhost:8080/order',data)
+                    .then(()=>this.$router.push('/account'))
+                    .catch(err=>alert(err))
+                }
+                
             }
         }
     }
@@ -65,7 +82,7 @@ import {cart} from "../store/cart.js"
                     <div class="col">TOTAL PRICE</div>
                     <div class="col text-right">{{total}} ฿</div>
                 </div>
-                <button class="btn">CHECKOUT</button>
+                <button class="btn" @click="onCheckOut">CHECKOUT</button>
             </div>
         </div> 
     </div>

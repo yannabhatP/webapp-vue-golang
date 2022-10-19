@@ -26,6 +26,11 @@ type Person struct {
 	Lname   string `db:"lname" json:"lname"`
 	Address string `db:"address" json:"address"`
 }
+type Order struct {
+	Email  string `db:"per_email" json:"email"`
+	OrderD string `db:"product_data" json:"o_detail"`
+	OrderT string `db:"order_time" json:"time"`
+}
 
 var db *sqlx.DB
 
@@ -111,101 +116,50 @@ func addPerson(per Person) error {
 	return nil
 }
 
-/*
-	func getAttractions() ([]Attractions, error) {
-		query := "select id, name, detail,coverimage from attractions"
-		attrac := []Attractions{}
-		err := db.Select(&attrac, query)
-		if err != nil {
-			return nil, err
-		}
-		return attrac, nil
+func addOrderDetail(order Order) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
 	}
-
-	func getAttraction(id int) (*Attractions, error) {
-		query := "select id, name, detail,coverimage from attractions where id=?"
-		attrac := Attractions{}
-		err := db.Get(&attrac, query, id)
-		if err != nil {
-			return nil, err
-		}
-		return &attrac, nil
+	query := "insert into order_details (per_email, product_data) value (?, ?)"
+	result, err := tx.Exec(query, order.Email, order.OrderD)
+	if err != nil {
+		return err
 	}
-
-	func addAttraction(attrac Attractions) error {
-		tx, err := db.Begin()
-		if err != nil {
-			return err
-		}
-		query := "insert into attractions (id, name, detail, coverimage) value (?, ?, ?, ?)"
-		result, err := tx.Exec(query, attrac.Id, attrac.Name, attrac.Detail, attrac.CoverImage)
-		if err != nil {
-			return err
-		}
-		affected, err := result.RowsAffected()
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-		if affected <= 0 {
-			return errors.New("cannot insert into attraction")
-		}
-		err = tx.Commit()
-		if err != nil {
-			return err
-		}
-		return nil
+	affected, err := result.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		return err
 	}
-
-	func editAttraction(attrac Attractions) error {
-		fmt.Println(attrac)
-		tx, err := db.Begin()
-		if err != nil {
-			return err
-		}
-		query := "update attractions set name=?, detail=?, coverimage=? where id=?"
-		result, err := tx.Exec(query, attrac.Name, attrac.Detail, attrac.CoverImage, attrac.Id)
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-		affected, err := result.RowsAffected()
-		if err != nil {
-			return err
-		}
-		if affected <= 0 {
-			return errors.New("cannot update attraction")
-		}
-		err = tx.Commit()
-		if err != nil {
-			return err
-		}
-		return nil
+	if affected <= 0 {
+		return errors.New("cannot insert into attraction")
 	}
-
-	func removeAttraction(id int) error {
-		tx, err := db.Begin()
-		if err != nil {
-			return err
-		}
-		query := "delete from attractions where id=?"
-		result, err := tx.Exec(query, id)
-		if err != nil {
-			return err
-		}
-		affected, err := result.RowsAffected()
-		if err != nil {
-			tx.Rollback()
-			return err
-
-		}
-		if affected <= 0 {
-			return errors.New("cannot delete attraction")
-		}
-		tx.Commit()
-		return nil
+	err = tx.Commit()
+	if err != nil {
+		return err
 	}
-*/
+	return nil
+}
+
+func getOrderDetail(email string) ([]Order, error) {
+	query := "select per_email, order_time, product_data from order_details where per_email = ? order by order_time desc"
+	ord := []Order{}
+	err := db.Select(&ord, query, email)
+	if err != nil {
+		return nil, err
+	}
+	return ord, nil
+}
+func getOrderDetails() ([]Order, error) {
+	query := "select per_email, order_time, product_data from order_details "
+	ord := []Order{}
+	err := db.Select(&ord, query)
+	if err != nil {
+		return nil, err
+	}
+	return ord, nil
+}
+
 func GetAllProduct(c *gin.Context) {
 	allproduct, err := getAllProduct()
 	if err != nil {
@@ -267,82 +221,38 @@ func PostPerson(c *gin.Context) {
 		c.IndentedJSON(http.StatusNotFound, err)
 		return
 	}
-	//albums = append(albums, newAlbum)
 	c.IndentedJSON(http.StatusCreated, p)
 }
 
-/*
-	func GetAttractions(c *gin.Context) {
-		attractions, err := getAttractions()
-		if err != nil {
-			c.IndentedJSON(http.StatusNotFound, err)
-			return
-		}
-		c.IndentedJSON(http.StatusOK, attractions)
+func PostOrderDetail(c *gin.Context) {
+	var o Order
+	if err := c.BindJSON(&o); err != nil {
+		return
 	}
-
-	func GetAttraction(c *gin.Context) {
-		strId := c.Param("id")
-		id, err := strconv.Atoi(strId)
-		if err != nil {
-			fmt.Println(err)
-		}
-		attraction, err := getAttraction(id)
-		if err != nil {
-			c.IndentedJSON(http.StatusNotFound, err)
-			return
-		}
-		c.IndentedJSON(http.StatusOK, attraction)
+	err := addOrderDetail(o)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, err)
+		return
 	}
-
-	func PostAttraction(c *gin.Context) {
-		var a Attractions
-		if err := c.BindJSON(&a); err != nil {
-			return
-		}
-		err := addAttraction(a)
-		if err != nil {
-			c.IndentedJSON(http.StatusNotFound, err)
-			return
-		}
-		//albums = append(albums, newAlbum)
-		c.IndentedJSON(http.StatusCreated, a)
-	}
-
-	func PutAttraction(c *gin.Context) {
-		var a Attractions
-		if err := c.BindJSON(&a); err != nil {
-			return
-		}
-		strId := c.Param("id")
-		id, err1 := strconv.Atoi(strId)
-		if err1 != nil {
-			fmt.Println(err1)
-		}
-		a.Id = id
-		err := editAttraction(a)
-		if err != nil {
-			c.IndentedJSON(http.StatusNotFound, err)
-			return
-		}
-		c.JSON(http.StatusOK, a)
-	}
-
-	func DeleteAttraction(c *gin.Context) {
-		strId := c.Param("id")
-		id, err1 := strconv.Atoi(strId)
-		if err1 != nil {
-			fmt.Println(err1)
-		}
-		err := removeAttraction(id)
-		if err != nil {
-			c.IndentedJSON(http.StatusNotFound, err)
-			return
-		}
-		c.JSON(http.StatusOK, "delete success")
-
+	c.IndentedJSON(http.StatusCreated, o)
 }
-*/
+func GetOrderDetail(c *gin.Context) {
+	strEmail := c.Param("email")
+	order, err := getOrderDetail(strEmail)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, err)
+		return
+	}
+	c.IndentedJSON(http.StatusOK, order)
+}
+func GetAllOrderDetail(c *gin.Context) {
+	alldetail, err := getOrderDetails()
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, err)
+		return
+	}
+	c.IndentedJSON(http.StatusOK, alldetail)
+}
 func main() {
 	var err error
 	db, err = sqlx.Open("mysql", "root:12345678@/shop")
@@ -357,7 +267,6 @@ func main() {
 	router := gin.Default()
 	router.SetTrustedProxies([]string{"192.168.1.2"})
 	router.Use(cors.Default())
-	//router.GET("/", GetAttractions)
 	router.GET("/all", GetAllProduct)
 	router.GET("/slim", GetSlimProduct)
 	router.GET("/normal", GetNormalProduct)
@@ -365,10 +274,10 @@ func main() {
 	router.GET("/person/:email", GetPerson)
 	router.GET("/person", GetAllPerson)
 	router.POST("/person", PostPerson)
-	//router.GET("/:id", GetAttraction)
-	//router.POST("/", PostAttraction)
-	//router.PUT("/:id", PutAttraction)
-	//router.DELETE("/:id", DeleteAttraction)
+	router.GET("/order", GetAllOrderDetail)
+	router.POST("/order", PostOrderDetail)
+	router.GET("/order/:email", GetOrderDetail)
+
 	router.Run("localhost:8080")
 
 }
