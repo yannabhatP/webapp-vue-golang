@@ -73,7 +73,6 @@
                         <div class="row">
                             <label>Color</label><br/>
                             <div class="column m-2">
-                                <h5>{{selectColor}}</h5>
                                 <input type="radio" class="btn-check" style="background-color:#A9A9A9;" id="Dark"  value="DarkGray" v-model="selectColor"/>
                                 <label for="Dark" class="btn m-1" style="background-color:#A9A9A9;">DarkGray</label>
                                 <input type="radio" class="btn-check" id="Light"  value="LightGray" v-model="selectColor"/>
@@ -85,7 +84,6 @@
                         <div class="row">
                             <label>Switch</label><br/>
                             <div class="column m-2">
-                                <h5>{{selectSwitch}}</h5>
                                 <input type="radio" class="btn-check" id="redswitch" value="Red" v-model="selectSwitch">
                                 <label class="btn m-1" for="redswitch" style="background-color:red;">Red</label>
                                 <input type="radio" class="btn-check " id="blownswitch" value="Brown" v-model="selectSwitch" >
@@ -99,7 +97,6 @@
                         <div class="row">
                             <label>Language</label><br/>
                             <div class="column m-2">
-                                <h5>{{selectLanguage}}</h5>
                                 <input type="radio" class="btn-check" id="th" v-model="selectLanguage" value="Thai">
                                 <label class="btn m-1" style="background-color:#ddd;" for="th">Thai</label>
                                 <input type="radio" class="btn-check " id="eng" v-model="selectLanguage" value="English">
